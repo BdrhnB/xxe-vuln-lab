@@ -1,9 +1,7 @@
-<<<<<<< HEAD
 This repository allows you to prove your xxe security skills
-=======
-# MediVault — HTB Starting Point
 
-> **Difficulty:** Very Easy
+# HealthCare
+
 > **Category:** Web / Linux
 > **Attack Chain:** XXE → Credential Disclosure → File Upload → RCE → Internal Pivot → Command Injection → Privilege Escalation
 
