@@ -128,4 +128,3 @@ The root flag isn't on this machine. Check `/etc/hosts` and scan the internal su
 <summary><b>Hint 7</b> — Found the monitor service?</summary>
 The `/ping` endpoint takes a host parameter. What happens if you append a semicolon?
 </details>
->>>>>>> a00a62a (all lab completly updated)
