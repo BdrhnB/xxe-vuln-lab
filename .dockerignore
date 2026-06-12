@@ -1,0 +1,11 @@
+.git
+.gitignore
+README.md
+SOLUTION.md
+*.md
+__pycache__
+*.pyc
+.env
+docker-compose.yml
+monitor/
+user.txt
