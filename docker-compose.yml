@@ -4,9 +4,9 @@ services:
     container_name: medivault-webapp
     hostname: webapp
     ports:
-      - "5001:5000"    # Flask ana uygulama
-      - "8082:8080"    # Apache/PHP (uploads dizini icin)
-      - "2223:22"      # SSH
+      - "80:5000"      # Flask main application (hospital website)
+      - "8080:8080"    # Apache/PHP (serves uploads directory)
+      - "22:22"        # SSH
     networks:
       healthnet:
         ipv4_address: 172.20.0.10
@@ -16,7 +16,7 @@ services:
     build: ./monitor
     container_name: medivault-monitor
     hostname: monitor
-    # Port disariya acik DEGIL — sadece internal agdan erisilebilir
+    # Port NOT exposed externally — internal network only
     expose:
       - "8080"
     networks:

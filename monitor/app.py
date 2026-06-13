@@ -1,7 +1,7 @@
 """
 HealthSync Internal Network Monitor Service
-Sadece internal agdan erisilebilir.
-Command injection zaafiyeti barindirir.
+Internal network access only.
+Deliberately contains command injection vulnerability.
 """
 from flask import Flask, request, jsonify
 import subprocess
@@ -29,12 +29,13 @@ def health():
 @app.route('/ping', methods=['GET'])
 def ping():
     """
-    Zaafiyetli endpoint: Kullanici girdisi dogrudan shell'e aktariliyor.
-    Ornek kullanim: GET /ping?host=8.8.8.8
+    Vulnerable endpoint: User input passed directly to shell.
+    Example: GET /ping?host=8.8.8.8
+    Command injection: GET /ping?host=8.8.8.8;id
     """
     host = request.args.get('host', '127.0.0.1')
 
-    # GUvensiz: kullanici girdisi dogrudan os.popen()'e gidiyor
+    # UNSAFE: user input goes directly to os.popen()
     cmd = f"ping -c 2 {host} 2>&1"
     try:
         output = os.popen(cmd).read()
@@ -49,7 +50,7 @@ def ping():
 @app.route('/diagnose', methods=['GET'])
 def diagnose():
     """
-    Ikinci zaafiyetli endpoint: network diagnostik.
+    Second vulnerable endpoint: network diagnostics.
     GET /diagnose?target=127.0.0.1
     """
     target = request.args.get('target', 'localhost')
@@ -69,7 +70,7 @@ def diagnose():
 @app.route('/admin', methods=['GET'])
 def admin():
     """
-    Gizli admin paneli — sadece internal ag icin.
+    Hidden admin panel — internal network only.
     """
     return jsonify({
         "message": "Admin panel — restricted to internal network",
