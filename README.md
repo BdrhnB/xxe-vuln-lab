@@ -1,135 +1,90 @@
-<<<<<<< HEAD
-# HealthCare
+# HealthSync
 
-**Difficulty:** Easy
-**OS:** Linux
-**Attack Chain:** XXE → Credential Disclosure → File Upload → RCE → Lateral Movement → Command Injection
-=======
-This repository allows you to prove your xxe security skills
-
-# HealthCare
-
-> **Category:** Web / Linux
-> **Attack Chain:** XXE → Credential Disclosure → File Upload → RCE → Internal Pivot → Command Injection → Privilege Escalation
->>>>>>> de9876ba6183db982bca7ba6b28201b21fd8331f
-
----
+A Docker-based penetration testing lab simulating a realistic healthcare platform breach. Chain multiple vulnerabilities — from web application exploitation to internal network pivoting — to capture both flags.
 
 ## Story
 
-HealthSync is one of Türkiye's largest digital healthcare management platforms, connecting 47 hospitals and serving over 850,000 patients. Three weeks ago, an anonymous whistleblower surfaced on a dark-web forum claiming to possess complete patient records — medical histories, prescriptions, test results, and personal identifiers — allegedly exfiltrated from HealthSync's primary web application server.
+HealthSync is a digital healthcare management platform connecting 47 hospitals and serving over 850,000 patients. Three weeks after launch, patient records began appearing on dark-web forums. The system administrator, a contractor named **Magnus Vinter**, has been unreachable since the breach.
 
-The system administrator, a contractor named **Magnus Vinter**, has been unreachable since the breach was discovered. A preliminary external audit uncovered anomalous outbound traffic originating from the web application server on May 14, 2026 — the same day Magnus last modified the system configuration.
-
-Your task as an incident response specialist:
-
-1. Identify the initial attack vector used to compromise the HealthSync web application
-2. Trace the lateral movement path through their internal network
-3. Recover the two digital signatures left behind — one on the web server, one on an internal monitoring node
-
----
+As an incident response specialist, your task is to trace the attackers' path through the infrastructure and recover the digital signatures they left behind.
 
 ## Network Topology
 
 ```
-┌─────────────────────────────────┐
-│        Attacker Machine          │
-│     (Your Attack Platform)       │
-└───────────────┬─────────────────┘
-                │
-    ┌───────────┴──────────────┐
-    │   Host Port Mappings        │
-    │   80 → Flask Web App        │
-    │   8080 → Apache/PHP         │
-    │   22 → SSH                  │
-    └───────────┬──────────────┘
-                │
-   ╔════════════╧════════════════╗
-   ║   healthnet (172.20.0.0/24) ║
-   ╠════════════╤════════════════╣
-   ║            │                ║
-┌──┴──────┐  ┌──┴──────┐
-│ webapp   │  │ monitor  │
-│.10       │  │.20       │
-│          │  │          │
-│Flask:5000│  │Flask:8080│
-│Apache:80 │  │(internal)│
-│SSH:22    │  │          │
-│          │  │ root.txt │
-│user.txt  │  │          │
-└──────────┘  └──────────┘
+Internet
+   │
+   ├── :80   → Flask (hospital web application)
+   ├── :8080 → Apache/PHP (file server)
+   └── :22   → SSH
+          │
+   ╔═══════╧════════════╗
+   ║  healthnet          ║
+   ║  172.20.0.0/24      ║
+   ╠═════════╤══════════╣
+   ║         │           ║
+  webapp    monitor      ║
+  .10       .20          ║
+   │                     ║
+   ├─ Flask :5000        ║
+   ├─ Apache :8080       ║
+   ├─ SSH :22             ║
+   └─ user.txt           ║
+                         ║
+                  Flask :8080 (internal)
+                  root.txt
 ```
 
----
+## Attack Path
 
-## Flags
+1. **Reconnaissance** — `robots.txt` reveals hidden endpoints
+2. **XXE Injection** — Read the application config file via XML external entity
+3. **Credential Theft** — Extract portal credentials from the leaked config
+4. **File Upload** — Upload a PHP webshell through the authenticated portal
+5. **Remote Code Execution** — Execute commands via the uploaded webshell
+6. **SSH Key Theft** — Steal the devops user's private key
+7. **Initial Access** — SSH into the webapp container, capture user flag
+8. **Internal Reconnaissance** — Scan the internal subnet for additional services
+9. **Command Injection** — Exploit the internal monitor service running as root
+10. **Privilege Escalation** — Capture the root flag via command injection
 
-| Flag | Path | Owner | Perms |
-|------|------|-------|-------|
-| user.txt | `/home/devops/user.txt` | root:devops | 644 |
-| root.txt | `/root/root.txt` | root:root | 640 |
-
----
-
-## Setup
+## Quick Start
 
 ```bash
+git clone <repo-url>
+cd HealthSync
 docker compose up -d --build
 ```
 
 Verify:
 
 ```bash
-curl -s http://localhost/health
+curl http://localhost/health
 # {"service":"healthsync-webapp","status":"ok","version":"2.4.1"}
 ```
 
----
+## Requirements
 
-## Intended Attack Path
+- Docker Engine 24+
+- Docker Compose v2
+- 2 GB RAM, 2 CPUs
 
-1. **Reconnaissance** — Discover hidden paths via `robots.txt`
-2. **XXE Injection** — Extract credentials from `/etc/healthsync/app.conf`
-3. **Authentication Bypass** — Login to upload portal with leaked credentials
-4. **File Upload — Webshell** — Upload PHP shell, gain RCE via Apache on port 8080
-5. **Credential Theft** — Extract SSH private key from `/home/devops/.ssh/id_rsa`
-6. **SSH Access** — Connect as `devops` on port 22, capture `user.txt`
-7. **Internal Reconnaissance** — Scan internal subnet, discover monitor service at 172.20.0.20:8080
-8. **Command Injection** — Exploit `/ping` endpoint, escalate to root on monitor
-9. **Capture root.txt**
+## Services
 
----
+| Container | Hostname | IP | Exposed |
+|-----------|----------|----|---------|
+| medivault-webapp | webapp | 172.20.0.10 | :80, :8080, :22 |
+| medivault-monitor | monitor | 172.20.0.20 | — (internal) |
 
-## Credentials
+## Vulnerabilities
 
-<<<<<<< HEAD
-| User | Password | Purpose |
-|------|----------|---------|
-| magnus | superman | Upload portal login |
-| devops | devops2026! | SSH access (key preferred) |
-=======
-<details>
-<summary><b>Hint 3</b> — Did you get creds?</summary>
-If you've read the config file, you have a username and password. Look for login pages under the disallowed paths.
-</details>
+| CWE | Vulnerability | Location |
+|-----|-------------|----------|
+| CWE-611 | XML External Entity (XXE) Injection | `/api/appointment/check` |
+| CWE-256 | Plaintext Credential Storage | `/etc/healthsync/app.conf` |
+| CWE-434 | Unrestricted File Upload | `/uploads/upload` |
+| CWE-538 | Sensitive File Exposure | `/home/devops/.ssh/id_rsa` |
+| CWE-78 | OS Command Injection | Monitor `/ping`, `/diagnose` |
 
-<details>
-<summary><b>Hint 4</b> — You're in. Now what?</summary>
-The upload panel accepts `.php` files. The files are served by Apache on a different port. Check port 8081.
-</details>
+## License
 
-<details>
-<summary><b>Hint 5</b> — Need a foothold?</summary>
-Check `/home/devops/.ssh/` for SSH keys. SSH is listening on port 2222.
-</details>
-
-<details>
-<summary><b>Hint 6</b> — You have a shell. Where's the second flag?</summary>
-The root flag isn't on this machine. Check `/etc/hosts` and scan the internal subnet.
-</details>
-
-<details>
-<summary><b>Hint 7</b> — Found the monitor service?</summary>
-The `/ping` endpoint takes a host parameter. What happens if you append a semicolon?
-</details>
->>>>>>> de9876ba6183db982bca7ba6b28201b21fd8331f
+This project is for educational and training purposes only.
