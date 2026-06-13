@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 # HealthCare
 
 **Difficulty:** Easy
 **OS:** Linux
 **Attack Chain:** XXE → Credential Disclosure → File Upload → RCE → Lateral Movement → Command Injection
+=======
+This repository allows you to prove your xxe security skills
+
+# HealthCare
+
+> **Category:** Web / Linux
+> **Attack Chain:** XXE → Credential Disclosure → File Upload → RCE → Internal Pivot → Command Injection → Privilege Escalation
+>>>>>>> de9876ba6183db982bca7ba6b28201b21fd8331f
 
 ---
 
@@ -93,7 +102,34 @@ curl -s http://localhost/health
 
 ## Credentials
 
+<<<<<<< HEAD
 | User | Password | Purpose |
 |------|----------|---------|
 | magnus | superman | Upload portal login |
 | devops | devops2026! | SSH access (key preferred) |
+=======
+<details>
+<summary><b>Hint 3</b> — Did you get creds?</summary>
+If you've read the config file, you have a username and password. Look for login pages under the disallowed paths.
+</details>
+
+<details>
+<summary><b>Hint 4</b> — You're in. Now what?</summary>
+The upload panel accepts `.php` files. The files are served by Apache on a different port. Check port 8081.
+</details>
+
+<details>
+<summary><b>Hint 5</b> — Need a foothold?</summary>
+Check `/home/devops/.ssh/` for SSH keys. SSH is listening on port 2222.
+</details>
+
+<details>
+<summary><b>Hint 6</b> — You have a shell. Where's the second flag?</summary>
+The root flag isn't on this machine. Check `/etc/hosts` and scan the internal subnet.
+</details>
+
+<details>
+<summary><b>Hint 7</b> — Found the monitor service?</summary>
+The `/ping` endpoint takes a host parameter. What happens if you append a semicolon?
+</details>
+>>>>>>> de9876ba6183db982bca7ba6b28201b21fd8331f
