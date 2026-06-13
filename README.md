@@ -50,7 +50,7 @@ Internet
 ## Quick Start
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/BdrhnB/xxe-vuln-lab.git
 cd HealthSync
 docker compose up -d --build
 ```
