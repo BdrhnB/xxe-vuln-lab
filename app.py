@@ -1,7 +1,3 @@
-"""
-HealthSync — Smart Hospital Management System
-v2.4.1 — Production Build
-"""
 from flask import Flask, redirect, url_for, render_template, request, session, jsonify, send_from_directory
 from functools import wraps
 import os
