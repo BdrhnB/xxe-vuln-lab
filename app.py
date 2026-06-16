@@ -60,8 +60,6 @@ def api_index():
         "note": "All API calls require Content-Type: application/xml."
     })
 
-
-# --- XXE VULNERABILITY ENDPOINT ---
 @app.route('/api/appointment/check', methods=['POST'])
 def check_appointment():
     try:
@@ -136,8 +134,6 @@ def upload_logout():
     session.pop('logged_in', None)
     return redirect(url_for('upload_login'))
 
-
-# Serve uploaded files — needed for webshell execution
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
