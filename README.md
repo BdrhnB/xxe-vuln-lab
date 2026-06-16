@@ -51,7 +51,7 @@ Internet
 
 ```bash
 git clone https://github.com/BdrhnB/xxe-vuln-lab.git
-cd HealthSync
+cd xxe-vuln-lab
 docker compose up -d --build
 ```
 
